@@ -1,27 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 
-const customerSchema = new mongoose.Schema({
-  isGold: {
-    type: Boolean,
-    default: false
-  },
-  name: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 50
-  },
-  phone: {
-    type: String,
-    required: true,
-    minlength: 5,
-    maxlengt: 50
-  }
-})
-
-const Customer = mongoose.model('Customer', customerSchema);
+const { validate, Customer } = require('../models/customer');
 
 router.get('/', async (req, res) => {
   const customers = await Customer.find().sort('name')
@@ -35,6 +15,9 @@ router.get('/:id', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
+  const { error } = validate(req.body)
+  if (error) res.status(400).send(error.details[0].message)
+  
   let customer = new Customer({
     name: req.body.name,
     isGold: req.body.isGold,
@@ -45,9 +28,12 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
+  const { error } = validate(req.body)
+  if (error) return res.status(400).send(error.details[0].message)
+
   const customer = await Customer.findByIdAndUpdate(
     req.params.id,
-    { name: req.body.name, isGold: req.params.isGold },
+    { name: req.body.name, phone: req.body.phone, isGold: req.body.isGold },
     { new: true }
   )
   res.send(customer)
@@ -59,5 +45,4 @@ router.delete('/:id', async (req, res) => {
   res.send(customer)
 })
 
-
-module.exports = router
+module.exports = router 
