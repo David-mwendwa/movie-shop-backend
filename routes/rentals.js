@@ -1,8 +1,12 @@
+const Fawn = require('fawn');
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 
+Fawn.init(mongoose);
+
 const { validate, Rental } = require('../models/rental');
-const { movie, Movie } = require('../models/movie');
+const { Movie } = require('../models/movie');
 const { Customer } = require('../models/customer');
 
 router.get('/', async (req, res) => {
@@ -40,26 +44,16 @@ router.post('/', async (req, res) => {
       dailyRentalRate: movie.dailyRentalRate,
     },
   });
-  rental = await rental.save();
-  movie.numberInStock--;
-  movie.save();
-  res.send(rental);
+  // For atamic transcation
+  try {
+    new Fawn.Task()
+      .save('rentals', rental)
+      .update('movies', { _id: movie._id }, { $inc: { numberInStock: -1 } })
+      .run();
+    res.send(rental);
+  } catch (error) {
+    res.status(500).send('Internal server error.');
+  }
 });
 
-router.put('/:id', async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-  const rental = await Rental.findByIdAndUpdate(
-    req.params.id,
-    { name: req.body.name },
-    { new: true }
-  );
-  res.send(rental);
-});
-
-router.delete('/:id', async (req, res) => {
-  const rental = await Rental.findByIdAndRemove(req.params.id);
-  res.send(rental);
-});
-
-module.export = router;
+module.exports = router;
