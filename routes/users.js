@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
 const express = require('express');
@@ -18,8 +17,9 @@ router.post('/', async (req, res) => {
   user.password = await bcrypt.hash(user.password, salt);
   await user.save()
 
+  const token = user.generateAuthToken();
   const toBePicked = _.pick(user, ['_id', 'name', 'email'])
-  res.send(toBePicked);
+  res.header('x-auth-token', token).send(toBePicked);
 });
 
 
