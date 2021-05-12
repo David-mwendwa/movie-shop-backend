@@ -1,3 +1,3 @@
-module.exports = function(error, req, res, next) {
-  res.status(401).send('Something failed')
+module.exports = function(err, req, res, next) {
+  res.status(500).send('Something failed. Internal Server Error')
 }
