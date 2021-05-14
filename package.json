@@ -19,7 +19,8 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.4",
     "mongoose": "^5.0.2",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "winston": "^3.3.3"
   },
   "devDependencies": {},
   "repository": {
