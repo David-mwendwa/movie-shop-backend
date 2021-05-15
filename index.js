@@ -17,8 +17,18 @@ const auth = require('./routes/auth')
 const express = require('express');
 const app = express();
 
+process.on('uncaughtException', (ex) => {
+  winston.error(ex.message, ex)
+  process.exit(1)
+})
+
+process.on('unhandledRejection', (ex) => {
+  winston.error(ex.message, ex);
+  process.exit(1)
+});
+
 winston.add(winston.transports.File, { filename: 'logfile.log' });
-winston.add(winston.transports.MongoDB, { db: 'mongodb://localhost.vidly', level: 'error' });
+winston.add(winston.transports.MongoDB, { db: 'mongodb://localhost.vidly', level: 'info' });
 
 if (!config.get('jwtPrivateKey')) {
   console.error("FATAL ERROR: jwtPivateKey is not defined.")
