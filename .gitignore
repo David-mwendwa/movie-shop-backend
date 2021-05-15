@@ -1,4 +1,4 @@
 /node_modules
 
-/hash.js
-/logging.js
+.hash.js
+.logfile.js

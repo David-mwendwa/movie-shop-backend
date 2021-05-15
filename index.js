@@ -1,4 +1,3 @@
-const config = require('config');
 const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
@@ -8,12 +7,7 @@ const app = express();
 require('./startup/logging')
 require('./startup/routes')(app);
 require('./startup/db')();
-
-
-if (!config.get('jwtPrivateKey')) {
-  console.error('FATAL ERROR: jwtPivateKey is not defined.');
-  process.exit(1);
-}
+require('./startup/config')()
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
